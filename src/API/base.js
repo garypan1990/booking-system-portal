@@ -21,7 +21,19 @@ const axiosPost = function (url, body) {
   });
 };
 
+const axiosPut = function (url, body) {
+  const fullURL = `${Const.baseURL}${url}`;
+
+  return axios({
+    method: 'PUT',
+    url: fullURL,
+    'Content-Type': 'application/json',
+    data: body
+  });
+};
+
 export {
   axiosGet,
-  axiosPost
+  axiosPost,
+  axiosPut
 };

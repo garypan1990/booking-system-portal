@@ -53,24 +53,32 @@
       >
         <template v-slot:event="{ event }">
           <div>
-            <div>{{ event.teacherName }}</div>
+            <div @click="editSchdeule(event)">{{ event.teacherName }}</div>
           </div>
         </template>
       </v-calendar>
     </v-sheet>
+    <scheduleDialog
+      @close-dialog="closeDialog"
+      :openDialog="openDialog"
+      :scheduleDetails="bookingScheduleDetail"
+    ></scheduleDialog>
   </div>
 </template>
 
 <script>
+import scheduleDialog from './ScheduleDialogDetail.vue';
 import { axiosGet } from '../API/base';
 export default {
+  components: {
+    scheduleDialog,
+  },
   beforeMount() {
     this.memberId = this.$route.query.memberId;
     this.account = this.$route.query.account;
     axiosGet(`/getBookSchedule?account=${this.account}`)
       .then(res => {
         this.bookingSchedules = res.data;
-        console.log(res);
         for (let i = 0; i < this.bookingSchedules.length; i++) {
           let startTime = new Date(this.bookingSchedules[i].bookingStartTime);
           let endTime = new Date(this.bookingSchedules[i].bookingEndTime);
@@ -90,7 +98,11 @@ export default {
                 ? 'green'
                 : 'red',
             timed: false,
+            bookingScheduleId: this.bookingSchedules[i].bookingScheduleId,
+            account: this.bookingSchedules[i].account,
             teacherName: this.bookingSchedules[i].teacherName,
+            teacherId: this.bookingSchedules[i].teacherId,
+            teachingType: this.bookingSchedules[i].teachingType,
           });
         }
       })
@@ -98,12 +110,13 @@ export default {
         console.log(e);
       });
   },
-  watch: {},
   data() {
     return {
       memberId: 0,
       account: '',
       bookingSchedules: [],
+      bookingScheduleDetail: {},
+      openDialog: false,
       type: 'month',
       types: ['month', 'week', 'day', '4day'],
       mode: 'stack',
@@ -124,6 +137,13 @@ export default {
   methods: {
     backToPrePage() {
       this.$router.push('/index');
+    },
+    editSchdeule(data) {
+      this.openDialog = true;
+      this.bookingScheduleDetail = data;
+    },
+    closeDialog() {
+      this.openDialog = false;
     },
     getEvents() {
       // getEvents({ start, end }) {
@@ -159,7 +179,11 @@ export default {
               ? 'green'
               : 'red',
           timed: false,
+          bookingScheduleId: this.bookingSchedules[i].bookingScheduleId,
+          account: this.bookingSchedules[i].account,
           teacherName: this.bookingSchedules[i].teacherName,
+          teacherId: this.bookingSchedules[i].teacherId,
+          teachingType: this.bookingSchedules[i].teachingType,
         });
       }
 
