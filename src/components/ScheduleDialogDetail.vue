@@ -78,7 +78,7 @@
               <TimePicker
                 @save-dialog="startTimeChanged"
                 label="Start Time"
-                :timeInfo="startTimeFormat"
+                :timeInfo="bookingStartTime"
                 :allowedMinutes="allowStartMin"
               ></TimePicker>
             </v-col>
@@ -102,9 +102,10 @@
 </template>
 
 <script>
+import moment from 'moment';
 import DatePicker from './DatePicker.vue';
 import TimePicker from './TimePicker.vue';
-// import { axiosPut } from '../API/base';
+import { axiosPut } from '../API/base';
 export default {
   name: 'ScheduleDialogDetail',
   components: {
@@ -135,38 +136,67 @@ export default {
     openDialog($event) {
       this.dialog = $event;
     },
-    'scheduleDetails.start': {
-      // caculate end time
-      handler(newVal) {
-        this.bookingEndTime =
-          newVal.getHours().toString() +
-          ':' +
-          (newVal.getMinutes() + this.classMiniutes)
-            .toString()
-            .padStart(2, '0');
+    scheduleDetails: {
+      handler(val) {
+        console.log(val);
+        this.bookingDate = moment(val.start).format('YYYY-MM-DD');
+        this.bookingStartTime = moment(val.start).format('HH:mm');
+        this.bookingEndTime = moment(val.end).format('HH:mm');
       },
       deep: true,
     },
-    bookingDate() {},
-    classMiniutes() {
+    bookingStartTime: {
       // caculate end time
-      if (this.classMiniutes === 50) {
-        this.scheduleDetails.start = new Date(this.scheduleDetails.start);
-        this.scheduleDetails.start.setMinutes(0);
-      }
-      this.bookingEndTime =
-        this.scheduleDetails.start.getHours().toString() +
-        ':' +
-        this.classMiniutes.toString().padStart(2, '0');
+      handler(newVal) {
+        console.log(newVal);
+        let momentObj = moment(newVal, 'HH:mm');
+        var originalHour = momentObj.hours(); // 取得原本的小時數字
+        var originalMinute = momentObj.minutes(); // 取得原本的分鐘數字
+
+        momentObj
+          .hours(originalHour)
+          .minutes(originalMinute + this.classMiniutes); // 將原本的小時和加上指定的分鐘數字
+
+        this.bookingEndTime = momentObj.format('HH:mm');
+      },
+      deep: true,
     },
-  },
-  computed: {
-    startTimeFormat() {
-      return (
-        this.scheduleDetails.start.getHours().toString() +
-        ':' +
-        this.scheduleDetails.start.getMinutes().toString().padStart(2, '0')
-      );
+    // 'scheduleDetails.start': {
+    //   // caculate end time
+    //   handler(newVal) {
+    //     this.bookingEndTime =
+    //       newVal.getHours().toString() +
+    //       ':' +
+    //       (newVal.getMinutes() + this.classMiniutes)
+    //         .toString()
+    //         .padStart(2, '0');
+    //   },
+    //   deep: true,
+    // },
+    bookingDate() {},
+    classMiniutes(val) {
+      // caculate end time
+      if (val === 50) {
+        let momentObj = moment(this.bookingStartTime, 'HH:mm');
+        let originalHour = momentObj.hour();
+        let originalMinute = momentObj.minutes();
+        if (originalMinute !== 0) {
+          momentObj.hour(originalHour).minutes(0);
+          this.bookingStartTime = momentObj.format('HH:mm');
+        } else {
+          momentObj.hour(originalHour).minutes(this.classMiniutes);
+          this.bookingEndTime = momentObj.format('HH:mm');
+        }
+      } else {
+        //val==25
+        let momentObj = moment(this.bookingStartTime, 'HH:mm');
+        let originalHour = momentObj.hour();
+        let originalMinute = momentObj.minutes();
+        momentObj
+          .hour(originalHour)
+          .minutes(originalMinute + this.classMiniutes);
+        this.bookingEndTime = momentObj.format('HH:mm');
+      }
     },
   },
   methods: {
@@ -175,36 +205,37 @@ export default {
       this.$emit('close-dialog', false);
     },
     saveDialog() {
-      console.log(this.scheduleDetails);
+      let startTimeStr = this.bookingDate + ' ' + this.bookingStartTime;
+      let endTimeStr = this.bookingDate + ' ' + this.bookingEndTime;
+
+      let startTimeISO = moment(startTimeStr, 'YYYY-MM-DD HH:mm')
+        .utc()
+        .format('YYYY-MM-DDTHH:mm:ss[Z]');
+
+      let endTimeISO = moment(endTimeStr, 'YYYY-MM-DD HH:mm')
+        .utc()
+        .format('YYYY-MM-DDTHH:mm:ss[Z]');
       let body = {
         bookingScheduleId: this.scheduleDetails.bookingScheduleId,
         account: this.scheduleDetails.account,
         teacherName: this.scheduleDetails.teacherName,
         teacherId: this.scheduleDetails.teacherId,
         teachingType: this.scheduleDetails.teachingType,
-        bookingStartTime: this.scheduleDetails.start
-          .toISOString()
-          .replace('Z', '+00:00'),
-        bookingEndTime: this.caculateBookingEndTime(),
+        bookingStartTime: startTimeISO,
+        bookingEndTime: endTimeISO,
       };
-      console.log(body);
-      // axiosPut('/updateBookSchedule/',).then(res=>{
 
-      // })
-
-      this.dialog = false;
-      this.$emit('close-dialog', false);
+      axiosPut('/updateBookSchedule/', body).then(res => {
+        console.log(res);
+        this.dialog = false;
+        this.$emit('save-dialog', false);
+      });
     },
     datePickerSave($event) {
       this.bookingDate = $event;
     },
     startTimeChanged($event) {
-      let time = $event;
-      time = time.split(':');
-      this.scheduleDetails.start = new Date(this.scheduleDetails.start);
-      this.scheduleDetails.start.setHours(time[0]);
-      this.scheduleDetails.start.setMinutes(time[1]);
-      console.log(this.scheduleDetails.start);
+      this.bookingStartTime = $event;
     },
     endTimeCompute() {
       if (!this.scheduleDetails.start) return '';

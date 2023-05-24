@@ -60,6 +60,7 @@
     </v-sheet>
     <scheduleDialog
       @close-dialog="closeDialog"
+      @save-dialog="saveDialog"
       :openDialog="openDialog"
       :scheduleDetails="bookingScheduleDetail"
     ></scheduleDialog>
@@ -76,39 +77,7 @@ export default {
   beforeMount() {
     this.memberId = this.$route.query.memberId;
     this.account = this.$route.query.account;
-    axiosGet(`/getBookSchedule?account=${this.account}`)
-      .then(res => {
-        this.bookingSchedules = res.data;
-        for (let i = 0; i < this.bookingSchedules.length; i++) {
-          let startTime = new Date(this.bookingSchedules[i].bookingStartTime);
-          let endTime = new Date(this.bookingSchedules[i].bookingEndTime);
-          this.events.push({
-            name:
-              this.bookingSchedules[i].bookingStatus == null
-                ? 'None'
-                : this.bookingSchedules[i].bookingStatus == true
-                ? 'Success'
-                : 'Failed',
-            start: startTime,
-            end: endTime,
-            color:
-              this.bookingSchedules[i].bookingStatus == null
-                ? 'grey darken-1'
-                : this.bookingSchedules[i].bookingStatus == true
-                ? 'green'
-                : 'red',
-            timed: false,
-            bookingScheduleId: this.bookingSchedules[i].bookingScheduleId,
-            account: this.bookingSchedules[i].account,
-            teacherName: this.bookingSchedules[i].teacherName,
-            teacherId: this.bookingSchedules[i].teacherId,
-            teachingType: this.bookingSchedules[i].teachingType,
-          });
-        }
-      })
-      .catch(e => {
-        console.log(e);
-      });
+    this.getMemberDetail();
   },
   data() {
     return {
@@ -145,24 +114,56 @@ export default {
     closeDialog() {
       this.openDialog = false;
     },
+    saveDialog() {
+      this.openDialog = false;
+      this.bookingSchedules = [];
+      this.getMemberDetail();
+    },
+    getMemberDetail() {
+      axiosGet(`/getBookSchedule?account=${this.account}`)
+        .then(res => {
+          this.events = [];
+          this.bookingSchedules = res.data;
+          for (let i = 0; i < this.bookingSchedules.length; i++) {
+            let startTime = new Date(this.bookingSchedules[i].bookingStartTime);
+            let endTime = new Date(this.bookingSchedules[i].bookingEndTime);
+            this.events.push({
+              name:
+                this.bookingSchedules[i].bookingStatus == null
+                  ? 'None'
+                  : this.bookingSchedules[i].bookingStatus == true
+                  ? 'Success'
+                  : 'Failed',
+              start: startTime,
+              end: endTime,
+              color:
+                this.bookingSchedules[i].bookingStatus == null
+                  ? 'grey darken-1'
+                  : this.bookingSchedules[i].bookingStatus == true
+                  ? 'green'
+                  : 'red',
+              timed: false,
+              bookingScheduleId: this.bookingSchedules[i].bookingScheduleId,
+              account: this.bookingSchedules[i].account,
+              teacherName: this.bookingSchedules[i].teacherName,
+              teacherId: this.bookingSchedules[i].teacherId,
+              teachingType: this.bookingSchedules[i].teachingType,
+            });
+          }
+        })
+        .catch(e => {
+          console.log(e);
+        });
+    },
     getEvents() {
       // getEvents({ start, end }) {
-      // console.log(start, end);
-      const events = [];
 
-      // const min = new Date(`${start.date}T00:00:00`);
-      // const max = new Date(`${end.date}T23:59:59`);
-      // const days = (max.getTime() - min.getTime()) / 86400000;
-      // const eventCount = this.rnd(days, days + 20);
+      const events = [];
 
       for (let i = 0; i < this.bookingSchedules.length; i++) {
         let startTime = new Date(this.bookingSchedules[i].bookingStartTime);
         let endTime = new Date(this.bookingSchedules[i].bookingEndTime);
-        // const allDay = this.rnd(0, 3) === 0;
-        // const firstTimestamp = this.rnd(min.getTime(), max.getTime());
-        // const first = new Date(firstTimestamp - (firstTimestamp % 900000));
-        // const secondTimestamp = this.rnd(2, allDay ? 288 : 8) * 900000;
-        // const second = new Date(first.getTime() + secondTimestamp);
+
         events.push({
           name:
             this.bookingSchedules[i].bookingStatus == null
