@@ -34,9 +34,13 @@
         label="weekdays"
         class="ma-2"
       ></v-select>
-      <v-spacer></v-spacer>
+      <!-- <v-spacer></v-spacer> -->
       <v-btn icon class="ma-2" @click="$refs.calendar.next()">
         <v-icon>mdi-chevron-right</v-icon>
+      </v-btn>
+      <!-- <v-spacer></v-spacer> -->
+      <v-btn icon class="ma-2" @click="addSchedule">
+        <v-icon>mdi-plus</v-icon>
       </v-btn>
     </v-sheet>
     <v-sheet height="600">
@@ -68,6 +72,7 @@
 </template>
 
 <script>
+import moment from 'moment';
 import scheduleDialog from './ScheduleDialogDetail.vue';
 import { axiosGet } from '../API/base';
 export default {
@@ -77,12 +82,16 @@ export default {
   beforeMount() {
     this.memberId = this.$route.query.memberId;
     this.account = this.$route.query.account;
+    this.purchaseOrderId = this.$route.query.purchaseOrderId;
+    this.orderId = this.$route.query.orderId;
     this.getMemberDetail();
   },
   data() {
     return {
       memberId: 0,
       account: '',
+      purchaseOrderId: 0,
+      orderId: 0,
       bookingSchedules: [],
       bookingScheduleDetail: {},
       openDialog: false,
@@ -108,8 +117,9 @@ export default {
       this.$router.push('/index');
     },
     editSchdeule(data) {
-      this.openDialog = true;
       this.bookingScheduleDetail = data;
+      this.bookingScheduleDetail.type = 'edit';
+      this.openDialog = true;
     },
     closeDialog() {
       this.openDialog = false;
@@ -119,12 +129,30 @@ export default {
       this.bookingSchedules = [];
       this.getMemberDetail();
     },
+    addSchedule() {
+      this.bookingScheduleDetail = {
+        type: 'add',
+        account: this.$route.query.account,
+        orderId: this.$route.query.orderId,
+        start: moment().minutes(0).toDate(),
+        end: moment().minutes(0).toDate(),
+        teacherId: 103,
+        teacherName: '',
+        teachingType: 0,
+      };
+      this.openDialog = true;
+    },
     getMemberDetail() {
-      axiosGet(`/getBookSchedule?account=${this.account}`)
+      axiosGet(
+        `/getBookSchedule?account=${this.account}&purchaseOrderId=${this.purchaseOrderId}`
+      )
         .then(res => {
           this.events = [];
           this.bookingSchedules = res.data;
+
           for (let i = 0; i < this.bookingSchedules.length; i++) {
+            this.bookingSchedules[i].account = this.account;
+            this.bookingSchedules[i].orderId = this.orderId;
             let startTime = new Date(this.bookingSchedules[i].bookingStartTime);
             let endTime = new Date(this.bookingSchedules[i].bookingEndTime);
             this.events.push({
@@ -145,6 +173,9 @@ export default {
               timed: false,
               bookingScheduleId: this.bookingSchedules[i].bookingScheduleId,
               account: this.bookingSchedules[i].account,
+              orderId: this.bookingSchedules[i].orderId,
+              purchaseOrderId: this.bookingSchedules[i].purchaseOrderId,
+              lessonId: this.bookingSchedules[i].lessonId,
               teacherName: this.bookingSchedules[i].teacherName,
               teacherId: this.bookingSchedules[i].teacherId,
               teachingType: this.bookingSchedules[i].teachingType,
@@ -163,7 +194,7 @@ export default {
       for (let i = 0; i < this.bookingSchedules.length; i++) {
         let startTime = new Date(this.bookingSchedules[i].bookingStartTime);
         let endTime = new Date(this.bookingSchedules[i].bookingEndTime);
-
+        // this.bookingSchedules[i].account = this.accout;
         events.push({
           name:
             this.bookingSchedules[i].bookingStatus == null
@@ -182,6 +213,9 @@ export default {
           timed: false,
           bookingScheduleId: this.bookingSchedules[i].bookingScheduleId,
           account: this.bookingSchedules[i].account,
+          orderId: this.bookingSchedules[i].orderId,
+          purchaseOrderId: this.bookingSchedules[i].purchaseOrderId,
+          lessonId: this.bookingSchedules[i].lessonId,
           teacherName: this.bookingSchedules[i].teacherName,
           teacherId: this.bookingSchedules[i].teacherId,
           teachingType: this.bookingSchedules[i].teachingType,

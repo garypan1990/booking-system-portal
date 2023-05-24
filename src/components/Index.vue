@@ -25,7 +25,12 @@
         ></v-text-field>
       </v-toolbar>
     </template>
-
+    <template v-slot:item.orderOpts="{ item }">
+      <v-select
+        v-model="item.selectedPurchaseOrderId"
+        :items="item.orderOpts"
+      ></v-select>
+    </template>
     <template v-slot:item.actions="{ item }">
       <!-- Custom actions for each row item -->
       <v-icon @click="editItem(item)">mdi-pencil</v-icon>
@@ -45,6 +50,7 @@ export default {
         { text: 'First Name', value: 'firstName' },
         { text: 'Last Name', value: 'lastName' },
         { text: 'HiTutor Account', value: 'hiTutorAccount' },
+        { text: 'Purchase Order Number', value: 'orderOpts' },
         { text: 'Actions', value: 'actions', sortable: false },
       ],
       items: [],
@@ -59,16 +65,47 @@ export default {
       },
     };
   },
-  mounted() {
+  beforeMount() {
     axiosGet('/memberList/').then(res => {
       this.items = res.data;
+      this.items.forEach(item => {
+        let result = [];
+        for (let i of item.orders) {
+          let obj = {
+            text: i.purchaseOrderId,
+            value: i.purchaseOrderId,
+          };
+          result.push(obj);
+        }
+        if (item.orders[0]) {
+          item.selectedPurchaseOrderId = item.orders[0].purchaseOrderId;
+        } else {
+          item.selectedPurchaseOrderId = '';
+        }
+
+        item.orderOpts = result;
+
+        return item;
+      });
     });
   },
+
   methods: {
     editItem(item) {
+      let orderObj = item.orders.find(e => {
+        if (e.purchaseOrderId == item.selectedPurchaseOrderId) {
+          return e.orderId;
+        }
+      });
+
       this.$router.push({
         path: `${this.$route.path}/${item.memberId}`,
-        query: { memberId: item.memberId, account: item.account },
+        query: {
+          memberId: item.memberId,
+          account: item.account,
+          purchaseOrderId: item.selectedPurchaseOrderId,
+          orderId: orderObj.orderId,
+        },
       });
     },
     // deleteItem(item) {

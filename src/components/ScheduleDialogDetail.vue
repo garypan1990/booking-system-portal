@@ -2,7 +2,10 @@
   <v-dialog v-model="dialog" persistent max-width="600px">
     <v-card>
       <v-card-title>
-        <span class="text-h5">Booking Schedule</span>
+        <span v-if="scheduleDetails.type == 'edit'" class="text-h5"
+          >Edit Booking Schedule</span
+        >
+        <span v-else class="text-h5">Add Booking Schedule</span>
       </v-card-title>
       <v-card-text>
         <v-container>
@@ -47,7 +50,7 @@
             <v-col cols="12" sm="6" md="4">
               <v-select
                 v-model="scheduleDetails.teachingType"
-                label="Class Minutes"
+                label="Teaching Type"
                 :items="[
                   { text: 'Skype', value: 0 },
                   { text: 'J Mode', value: 4 },
@@ -105,7 +108,7 @@
 import moment from 'moment';
 import DatePicker from './DatePicker.vue';
 import TimePicker from './TimePicker.vue';
-import { axiosPut } from '../API/base';
+import { axiosPut, axiosPost } from '../API/base';
 export default {
   name: 'ScheduleDialogDetail',
   components: {
@@ -138,8 +141,9 @@ export default {
     },
     scheduleDetails: {
       handler(val) {
-        console.log(val);
-        this.bookingDate = moment(val.start).format('YYYY-MM-DD');
+        if (this.bookingDate == '')
+          this.bookingDate = moment(val.start).format('YYYY-MM-DD');
+
         this.bookingStartTime = moment(val.start).format('HH:mm');
         this.bookingEndTime = moment(val.end).format('HH:mm');
       },
@@ -161,19 +165,7 @@ export default {
       },
       deep: true,
     },
-    // 'scheduleDetails.start': {
-    //   // caculate end time
-    //   handler(newVal) {
-    //     this.bookingEndTime =
-    //       newVal.getHours().toString() +
-    //       ':' +
-    //       (newVal.getMinutes() + this.classMiniutes)
-    //         .toString()
-    //         .padStart(2, '0');
-    //   },
-    //   deep: true,
-    // },
-    bookingDate() {},
+
     classMiniutes(val) {
       // caculate end time
       if (val === 50) {
@@ -218,18 +210,36 @@ export default {
       let body = {
         bookingScheduleId: this.scheduleDetails.bookingScheduleId,
         account: this.scheduleDetails.account,
+        orderId: this.scheduleDetails.orderId,
         teacherName: this.scheduleDetails.teacherName,
         teacherId: this.scheduleDetails.teacherId,
         teachingType: this.scheduleDetails.teachingType,
         bookingStartTime: startTimeISO,
         bookingEndTime: endTimeISO,
       };
-
-      axiosPut('/updateBookSchedule/', body).then(res => {
-        console.log(res);
-        this.dialog = false;
-        this.$emit('save-dialog', false);
-      });
+      if (this.scheduleDetails.type == 'edit') {
+        axiosPut('/updateBookSchedule/', body).then(res => {
+          console.log(res);
+          this.dialog = false;
+          this.$emit('save-dialog', false);
+        });
+      }
+      if (this.scheduleDetails.type == 'add') {
+        console.log('add new');
+        console.log(body);
+        console.log(this.bookingDate);
+        body.schedules = [
+          {
+            bookingStartTime: startTimeISO,
+            bookingEndTime: endTimeISO,
+          },
+        ];
+        axiosPost('/addBookSchedule/', body).then(res => {
+          this.$emit('save-dialog', false);
+          console.log(res);
+          this.dialog = false;
+        });
+      }
     },
     datePickerSave($event) {
       this.bookingDate = $event;

@@ -55,7 +55,9 @@ export default {
       this.label = value;
     },
     dateTime(val) {
-      console.log(val);
+      this.date = new Date(val - new Date().getTimezoneOffset() * 60000)
+        .toISOString()
+        .slice(0, 10);
     },
   },
   methods: {
