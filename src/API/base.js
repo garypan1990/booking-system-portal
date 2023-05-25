@@ -5,7 +5,6 @@ import axios from 'axios';
 import Const from '../constants/index';
 
 const axiosGet = function (url) {
-  console.log(Const.baseURL);
   const fullURL = `${Const.baseURL}${url}`;
   return axios(fullURL);
 };
@@ -32,8 +31,17 @@ const axiosPut = function (url, body) {
   });
 };
 
+const axiosDel = function (url) {
+  const fullURL = `${Const.baseURL}${url}`;
+  return axios({
+    method: 'DELETE',
+    url: fullURL
+  });
+};
+
 export {
   axiosGet,
   axiosPost,
-  axiosPut
+  axiosPut,
+  axiosDel
 };

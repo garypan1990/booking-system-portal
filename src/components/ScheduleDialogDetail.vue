@@ -96,6 +96,7 @@
         </v-container>
       </v-card-text>
       <v-card-actions>
+        <v-btn color="red darken-1" text @click="delSchedule"> Delete</v-btn>
         <v-spacer></v-spacer>
         <v-btn color="blue darken-1" text @click="closeDialog"> Close </v-btn>
         <v-btn color="blue darken-1" text @click="saveDialog"> Save </v-btn>
@@ -108,7 +109,7 @@
 import moment from 'moment';
 import DatePicker from './DatePicker.vue';
 import TimePicker from './TimePicker.vue';
-import { axiosPut, axiosPost } from '../API/base';
+import { axiosPut, axiosPost, axiosDel } from '../API/base';
 export default {
   name: 'ScheduleDialogDetail',
   components: {
@@ -193,6 +194,7 @@ export default {
   },
   methods: {
     closeDialog() {
+      this.bookingDate = '';
       this.dialog = false;
       this.$emit('close-dialog', false);
     },
@@ -240,6 +242,15 @@ export default {
           this.dialog = false;
         });
       }
+    },
+    delSchedule() {
+      axiosDel(
+        `/deleteBookSchedule/${this.scheduleDetails.account}/${this.scheduleDetails.orderId}/${this.scheduleDetails.bookingScheduleId}`
+      ).then(res => {
+        console.log(res);
+        this.dialog = false;
+        this.$emit('del-dialog', false);
+      });
     },
     datePickerSave($event) {
       this.bookingDate = $event;

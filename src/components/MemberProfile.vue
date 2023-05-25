@@ -54,6 +54,7 @@
         :event-overlap-threshold="30"
         :event-color="getEventColor"
         @change="getEvents"
+        @click:date="addSchedule"
       >
         <template v-slot:event="{ event }">
           <div>
@@ -63,8 +64,10 @@
       </v-calendar>
     </v-sheet>
     <scheduleDialog
+      ref="schdueleDialog"
       @close-dialog="closeDialog"
       @save-dialog="saveDialog"
+      @del-dialog="delDialog"
       :openDialog="openDialog"
       :scheduleDetails="bookingScheduleDetail"
     ></scheduleDialog>
@@ -113,10 +116,15 @@ export default {
     };
   },
   methods: {
+    test(data) {
+      console.log('test');
+      console.log(data);
+    },
     backToPrePage() {
       this.$router.push('/index');
     },
     editSchdeule(data) {
+      console.log(data);
       this.bookingScheduleDetail = data;
       this.bookingScheduleDetail.type = 'edit';
       this.openDialog = true;
@@ -129,17 +137,33 @@ export default {
       this.bookingSchedules = [];
       this.getMemberDetail();
     },
-    addSchedule() {
+    delDialog() {
+      console.log('delDialog');
+      this.openDialog = false;
+      this.getMemberDetail();
+    },
+    addSchedule(value) {
+      console.log(value);
+      let todayHours = moment().toDate().getHours();
+
       this.bookingScheduleDetail = {
         type: 'add',
         account: this.$route.query.account,
         orderId: this.$route.query.orderId,
-        start: moment().minutes(0).toDate(),
-        end: moment().minutes(0).toDate(),
+
+        start: moment(value.date, 'YYYY-MM-DD')
+          .hour(todayHours)
+          .minutes(0)
+          .toDate(),
+        end: moment(value.date, 'YYYY-MM-DD')
+          .hour(todayHours)
+          .minutes(this.$refs.schdueleDialog.classMiniutes)
+          .toDate(),
         teacherId: 103,
         teacherName: '',
         teachingType: 0,
       };
+
       this.openDialog = true;
     },
     getMemberDetail() {

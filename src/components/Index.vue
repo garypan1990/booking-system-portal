@@ -26,15 +26,21 @@
       </v-toolbar>
     </template>
     <template v-slot:item.orderOpts="{ item }">
-      <v-select
-        v-model="item.selectedPurchaseOrderId"
-        :items="item.orderOpts"
-      ></v-select>
+      <v-row>
+        <v-col cols="12" sm="6">
+          <v-select
+            v-model="item.selectedPurchaseOrderId"
+            :items="item.orderOpts"
+          ></v-select>
+        </v-col>
+        <v-col class="order-plus-col" cols="12" sm="6">
+          <v-icon @click="addNewOrder(item)">mdi-plus</v-icon>
+        </v-col>
+      </v-row>
     </template>
     <template v-slot:item.actions="{ item }">
       <!-- Custom actions for each row item -->
       <v-icon @click="editItem(item)">mdi-pencil</v-icon>
-      <!-- <v-icon @click="deleteItem(item)">mdi-delete</v-icon> -->
     </template>
   </v-data-table>
   <!-- </v-container> -->
@@ -108,9 +114,18 @@ export default {
         },
       });
     },
+    addNewOrder(item) {
+      console.log(item);
+    },
     // deleteItem(item) {
     //   // Handle delete action
     // },
   },
 };
 </script>
+
+<style>
+.order-plus-col {
+  margin-top: 20px;
+}
+</style>
