@@ -52,7 +52,6 @@ export default {
       this.label = value;
     },
     timeInfo(value) {
-      console.log('timeInfo');
       this.time = value;
     },
   },

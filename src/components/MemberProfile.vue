@@ -38,10 +38,6 @@
       <v-btn icon class="ma-2" @click="$refs.calendar.next()">
         <v-icon>mdi-chevron-right</v-icon>
       </v-btn>
-      <!-- <v-spacer></v-spacer> -->
-      <v-btn icon class="ma-2" @click="addSchedule">
-        <v-icon>mdi-plus</v-icon>
-      </v-btn>
     </v-sheet>
     <v-sheet height="600">
       <v-calendar
@@ -79,6 +75,7 @@ import moment from 'moment';
 import scheduleDialog from './ScheduleDialogDetail.vue';
 import { axiosGet } from '../API/base';
 export default {
+  name: 'MemberProfile',
   components: {
     scheduleDialog,
   },
@@ -116,16 +113,16 @@ export default {
     };
   },
   methods: {
-    test(data) {
-      console.log('test');
-      console.log(data);
-    },
+    // test(data) {
+    //   console.log('test');
+    //   console.log(data);
+    // },
     backToPrePage() {
       this.$router.push('/index');
     },
     editSchdeule(data) {
-      console.log(data);
       this.bookingScheduleDetail = data;
+      console.log(this.bookingScheduleDetail);
       this.bookingScheduleDetail.type = 'edit';
       this.openDialog = true;
     },
@@ -138,12 +135,10 @@ export default {
       this.getMemberDetail();
     },
     delDialog() {
-      console.log('delDialog');
       this.openDialog = false;
       this.getMemberDetail();
     },
     addSchedule(value) {
-      console.log(value);
       let todayHours = moment().toDate().getHours();
 
       this.bookingScheduleDetail = {

@@ -37,15 +37,13 @@ export default {
       default: '',
     },
     dateTime: {
-      type: Date,
-      default: () => new Date().toISOString().slice(0, 10),
+      type: String,
+      default: '',
     },
   },
   data() {
     return {
-      date: new Date(this.dateTime - new Date().getTimezoneOffset() * 60000)
-        .toISOString()
-        .slice(0, 10),
+      date: this.dateTime,
       menu: false,
     };
   },
@@ -55,14 +53,11 @@ export default {
       this.label = value;
     },
     dateTime(val) {
-      this.date = new Date(val - new Date().getTimezoneOffset() * 60000)
-        .toISOString()
-        .slice(0, 10);
+      this.date = val;
     },
   },
   methods: {
-    clickSave($event) {
-      console.log($event);
+    clickSave() {
       this.$refs.menu.save(this.date);
       this.$emit('click-save', this.date);
     },
