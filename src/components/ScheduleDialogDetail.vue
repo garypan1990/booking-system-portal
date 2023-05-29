@@ -66,7 +66,7 @@
             <v-col cols="12" sm="6">
               <DatePicker
                 @click-save="datePickerSave"
-                :dateTime="scheduleDetails.start"
+                :dateTime="bookingDate"
                 :label="'Booking Date'"
               />
             </v-col>
@@ -92,11 +92,21 @@
                 readonly
               ></v-text-field>
             </v-col>
+            <v-col v-if="errorMsg != ''" style="color: red; font-size: 18px">
+              {{ 'error: ' + errorMsg }}
+            </v-col>
           </v-row>
         </v-container>
       </v-card-text>
       <v-card-actions>
-        <v-btn color="red darken-1" text @click="delSchedule"> Delete</v-btn>
+        <v-btn
+          v-if="scheduleDetails.type == 'edit'"
+          color="red darken-1"
+          text
+          @click="delSchedule"
+        >
+          Delete</v-btn
+        >
         <v-spacer></v-spacer>
         <v-btn color="blue darken-1" text @click="closeDialog"> Close </v-btn>
         <v-btn color="blue darken-1" text @click="saveDialog"> Save </v-btn>
@@ -126,6 +136,7 @@ export default {
       default: () => {},
     },
   },
+
   data() {
     return {
       dialog: false,
@@ -134,26 +145,23 @@ export default {
       bookingStartTime: '',
       bookingEndTime: '',
       classMiniutes: 50,
+      errorMsg: '',
     };
   },
   watch: {
     openDialog($event) {
       this.dialog = $event;
     },
-    scheduleDetails: {
-      handler(val) {
-        if (this.bookingDate == '')
-          this.bookingDate = moment(val.start).format('YYYY-MM-DD');
-
-        this.bookingStartTime = moment(val.start).format('HH:mm');
-        this.bookingEndTime = moment(val.end).format('HH:mm');
+    'scheduleDetails.start': {
+      handler(value) {
+        this.bookingStartTime = moment(value).format('HH:mm');
+        this.bookingDate = moment(value).format('YYYY-MM-DD');
       },
       deep: true,
     },
     bookingStartTime: {
       // caculate end time
       handler(newVal) {
-        console.log(newVal);
         let momentObj = moment(newVal, 'HH:mm');
         var originalHour = momentObj.hours(); // 取得原本的小時數字
         var originalMinute = momentObj.minutes(); // 取得原本的分鐘數字
@@ -195,6 +203,7 @@ export default {
   methods: {
     closeDialog() {
       this.bookingDate = '';
+      this.errorMsg = '';
       this.dialog = false;
       this.$emit('close-dialog', false);
     },
@@ -220,34 +229,40 @@ export default {
         bookingEndTime: endTimeISO,
       };
       if (this.scheduleDetails.type == 'edit') {
-        axiosPut('/updateBookSchedule/', body).then(res => {
-          console.log(res);
-          this.dialog = false;
-          this.$emit('save-dialog', false);
-        });
+        axiosPut('/updateBookSchedule/', body)
+          .then(() => {
+            this.dialog = false;
+            this.errorMsg = '';
+            this.$emit('save-dialog', false);
+          })
+          .catch(e => {
+            this.errorMsg = e.response.data.message;
+          });
       }
       if (this.scheduleDetails.type == 'add') {
-        console.log('add new');
-        console.log(body);
-        console.log(this.bookingDate);
         body.schedules = [
           {
             bookingStartTime: startTimeISO,
             bookingEndTime: endTimeISO,
           },
         ];
-        axiosPost('/addBookSchedule/', body).then(res => {
-          this.$emit('save-dialog', false);
-          console.log(res);
-          this.dialog = false;
-        });
+        axiosPost('/addBookSchedule/', body)
+          .then(() => {
+            this.$emit('save-dialog', false);
+
+            this.errorMsg = '';
+            this.dialog = false;
+          })
+          .catch(e => {
+            this.errorMsg = e.response.data.message;
+          });
       }
     },
     delSchedule() {
       axiosDel(
         `/deleteBookSchedule/${this.scheduleDetails.account}/${this.scheduleDetails.orderId}/${this.scheduleDetails.bookingScheduleId}`
-      ).then(res => {
-        console.log(res);
+      ).then(() => {
+        this.errorMsg = '';
         this.dialog = false;
         this.$emit('del-dialog', false);
       });
@@ -256,7 +271,10 @@ export default {
       this.bookingDate = $event;
     },
     startTimeChanged($event) {
+      console.log('startTimeChanged');
+
       this.bookingStartTime = $event;
+      console.log(this.bookingStartTime);
     },
     endTimeCompute() {
       if (!this.scheduleDetails.start) return '';
@@ -274,14 +292,6 @@ export default {
       }
     },
     allowEndMin: v => v == 25 || v == 50,
-    caculateBookingStartTime() {},
-    caculateBookingEndTime() {
-      const endDate = new Date(this.scheduleDetails.start);
-      endDate.setMinutes(this.classMiniutes);
-      const isoEndDatee = endDate.toISOString().replace('Z', '+00:00');
-      console.log(isoEndDatee);
-      return isoEndDatee;
-    },
   },
 };
 </script>
