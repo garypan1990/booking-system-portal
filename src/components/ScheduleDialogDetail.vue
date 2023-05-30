@@ -20,34 +20,27 @@
             </v-col>
             <!-- <v-col cols="12" sm="6" md="4">
               <v-text-field
-                label="Legal middle name"
-                hint="example of helper text only on focus"
-              ></v-text-field>
-            </v-col>
-            <v-col cols="12" sm="6" md="4">
-              <v-text-field
-                label="Legal last name*"
-                hint="example of persistent helper text"
-                persistent-hint
-                required
-              ></v-text-field>
-            </v-col> -->
-
-            <v-col cols="12" sm="6" md="4">
-              <v-text-field
                 v-model="scheduleDetails.teacherId"
                 label="Teacher ID"
                 required
               ></v-text-field>
-            </v-col>
-            <v-col cols="12" sm="6" md="4">
-              <v-text-field
+            </v-col> -->
+            <v-col cols="12" sm="6">
+              <v-select
+                v-model="scheduleDetails.teacherId"
+                label="Teaching Type"
+                :items="[
+                  { text: 'Lovely', value: 103 },
+                  { text: 'Analie', value: 5215 },
+                ]"
+              ></v-select>
+              <!-- <v-text-field
                 v-model="scheduleDetails.teacherName"
                 label="Teacher Name"
                 required
-              ></v-text-field>
+              ></v-text-field> -->
             </v-col>
-            <v-col cols="12" sm="6" md="4">
+            <v-col cols="12" sm="6">
               <v-select
                 v-model="scheduleDetails.teachingType"
                 label="Teaching Type"
@@ -56,11 +49,6 @@
                   { text: 'J Mode', value: 4 },
                 ]"
               ></v-select>
-              <!-- <v-text-field
-                v-model="teachingTypeTrasform"
-                label="Teacher Type"
-                required
-              ></v-text-field> -->
             </v-col>
 
             <v-col cols="12" sm="6">
@@ -141,6 +129,7 @@ export default {
     return {
       dialog: false,
       teachingTypeMap: { 0: 'Skype', 4: 'J Mode' },
+      teacherNameMap: { 103: 'Lovely', 5215: 'Analie' },
       bookingDate: '',
       bookingStartTime: '',
       bookingEndTime: '',
@@ -222,7 +211,7 @@ export default {
         bookingScheduleId: this.scheduleDetails.bookingScheduleId,
         account: this.scheduleDetails.account,
         orderId: this.scheduleDetails.orderId,
-        teacherName: this.scheduleDetails.teacherName,
+        teacherName: this.teacherNameMap[this.scheduleDetails.teacherId],
         teacherId: this.scheduleDetails.teacherId,
         teachingType: this.scheduleDetails.teachingType,
         bookingStartTime: startTimeISO,
