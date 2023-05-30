@@ -14,7 +14,7 @@ npm run serve
 ```
 npm run build
 ```
-
+Check constants/index.js baseUrl='http://<b>hostIP</b>:8000/api/bookingSystem'
 ### Lints and fixes files
 ```
 npm run lint
