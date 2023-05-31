@@ -229,7 +229,7 @@ export default {
               : this.bookingSchedules[i].bookingStatus == true
               ? 'green'
               : 'red',
-          timed: false,
+          timed: true,
           bookingScheduleId: this.bookingSchedules[i].bookingScheduleId,
           account: this.bookingSchedules[i].account,
           orderId: this.bookingSchedules[i].orderId,
@@ -240,14 +240,10 @@ export default {
           teachingType: this.bookingSchedules[i].teachingType,
         });
       }
-
       this.events = events;
     },
     getEventColor(event) {
       return event.color;
-    },
-    rnd(a, b) {
-      return Math.floor((b - a + 1) * Math.random()) + a;
     },
   },
 };
