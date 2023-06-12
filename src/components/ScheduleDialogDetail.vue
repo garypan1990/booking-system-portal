@@ -191,7 +191,10 @@ export default {
   },
   methods: {
     closeDialog() {
-      this.bookingDate = '';
+      // this.bookingDate = '';
+      this.bookingStartTime = moment(this.scheduleDetails.start).format(
+        'HH:mm'
+      );
       this.errorMsg = '';
       this.dialog = false;
       this.$emit('close-dialog', false);

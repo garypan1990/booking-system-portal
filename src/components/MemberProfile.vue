@@ -122,7 +122,6 @@ export default {
     },
     editSchdeule(data) {
       this.bookingScheduleDetail = data;
-      console.log(this.bookingScheduleDetail);
       this.bookingScheduleDetail.type = 'edit';
       this.openDialog = true;
     },
