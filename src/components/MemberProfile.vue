@@ -49,6 +49,7 @@
         :event-overlap-mode="mode"
         :event-overlap-threshold="30"
         :event-color="getEventColor"
+        :start="calendarShowStartTime"
         @change="getEvents"
         @click:date="addSchedule"
       >
@@ -95,6 +96,7 @@ export default {
       bookingSchedules: [],
       bookingScheduleDetail: {},
       openDialog: false,
+      calendarShowStartTime: moment().add(35, 'days').format('YYYY-MM-DD'),
       type: 'month',
       types: ['month', 'week', 'day', '4day'],
       mode: 'stack',
