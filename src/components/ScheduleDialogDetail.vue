@@ -28,7 +28,7 @@
             <v-col cols="12" sm="6">
               <v-select
                 v-model="scheduleDetails.teacherId"
-                label="Teaching Type"
+                label="Teacher Name"
                 :items="[
                   { text: 'Lovely', value: 103 },
                   { text: 'Analie', value: 5215 },
@@ -210,6 +210,13 @@ export default {
       let endTimeISO = moment(endTimeStr, 'YYYY-MM-DD HH:mm')
         .utc()
         .format('YYYY-MM-DDTHH:mm:ss[Z]');
+      if (
+        this.scheduleDetails.teacherId == 5215 &&
+        this.scheduleDetails.teachingType == 0
+      ) {
+        this.errorMsg = 'Teacher Analie can not teach on Skype.';
+        return;
+      }
       let body = {
         bookingScheduleId: this.scheduleDetails.bookingScheduleId,
         account: this.scheduleDetails.account,
@@ -220,6 +227,7 @@ export default {
         bookingStartTime: startTimeISO,
         bookingEndTime: endTimeISO,
       };
+      console.log(body);
       if (this.scheduleDetails.type == 'edit') {
         axiosPut('/updateBookSchedule/', body)
           .then(() => {
@@ -232,6 +240,7 @@ export default {
           });
       }
       if (this.scheduleDetails.type == 'add') {
+        console.log(body);
         body.schedules = [
           {
             bookingStartTime: startTimeISO,
