@@ -55,7 +55,10 @@
       >
         <template v-slot:event="{ event }">
           <div>
-            <div @click="editSchdeule(event)">{{ event.teacherName }}</div>
+            <div @click="editSchdeule(event)">
+              <span style="padding-right:50px">{{ event.teacherName }}</span>
+              <span>{{ timeShowFormat(event.start)}} ~ {{ timeShowFormat(event.end) }}</span>
+            </div>
           </div>
         </template>
       </v-calendar>
@@ -184,6 +187,7 @@ export default {
                   : 'Failed',
               start: startTime,
               end: endTime,
+              classMiniutes: this.bookingSchedules[i].classMiniutes,
               color:
                 this.bookingSchedules[i].bookingStatus == null
                   ? 'grey darken-1'
@@ -224,6 +228,7 @@ export default {
               : 'Failed',
           start: startTime,
           end: endTime,
+          classMiniutes: this.bookingSchedules[i].classMiniutes,
           color:
             this.bookingSchedules[i].bookingStatus == null
               ? 'grey darken-1'
@@ -246,6 +251,11 @@ export default {
     getEventColor(event) {
       return event.color;
     },
+    timeShowFormat(time){
+      let formattedTime = moment(time).format('HH:mm');
+      console.log(formattedTime);
+      return formattedTime;
+    }
   },
 };
 </script>

@@ -133,7 +133,7 @@ export default {
       bookingDate: '',
       bookingStartTime: '',
       bookingEndTime: '',
-      classMiniutes: 50,
+      classMiniutes: 25,
       errorMsg: '',
     };
   },
@@ -145,6 +145,14 @@ export default {
       handler(value) {
         this.bookingStartTime = moment(value).format('HH:mm');
         this.bookingDate = moment(value).format('YYYY-MM-DD');
+      },
+      deep: true,
+    },
+    'scheduleDetails.classMiniutes':{
+      handler(value) {
+        if(value){
+          this.classMiniutes = value;
+        }
       },
       deep: true,
     },
@@ -226,8 +234,8 @@ export default {
         teachingType: this.scheduleDetails.teachingType,
         bookingStartTime: startTimeISO,
         bookingEndTime: endTimeISO,
+        classMiniutes: this.classMiniutes
       };
-      console.log(body);
       if (this.scheduleDetails.type == 'edit') {
         axiosPut('/updateBookSchedule/', body)
           .then(() => {
@@ -245,6 +253,7 @@ export default {
           {
             bookingStartTime: startTimeISO,
             bookingEndTime: endTimeISO,
+            classMiniutes: this.classMiniutes
           },
         ];
         axiosPost('/addBookSchedule/', body)
