@@ -1,6 +1,6 @@
 'use strict';
 
-const baseURL = 'http://127.0.0.1:8000/api/bookingSystem';
+const baseURL = process.env.VUE_APP_API_URL;
 
 export default {
   baseURL
