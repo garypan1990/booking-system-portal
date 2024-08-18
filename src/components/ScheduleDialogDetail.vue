@@ -133,7 +133,7 @@ export default {
       bookingDate: '',
       bookingStartTime: '',
       bookingEndTime: '',
-      classMiniutes: 25,
+      classMiniutes: 50,
       errorMsg: '',
     };
   },
