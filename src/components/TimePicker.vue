@@ -57,7 +57,7 @@ export default {
   },
   methods: {
     save() {
-      console.log('save');
+      //console.log('save');
       this.dialog = false;
       this.$emit('save-dialog', this.time);
     },

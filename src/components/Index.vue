@@ -91,7 +91,6 @@ export default {
   },
   watch: {
     items(val) {
-      console.log(val);
       this.items = val;
     },
   },
@@ -139,8 +138,6 @@ export default {
       });
     },
     addNewOrder(item) {
-      console.log(item);
-      console.log(this.orderFormData);
       this.orderFormData.account = item.account;
       this.orderFormData.type = 'add';
 

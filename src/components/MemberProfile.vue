@@ -253,7 +253,7 @@ export default {
     },
     timeShowFormat(time){
       let formattedTime = moment(time).format('HH:mm');
-      console.log(formattedTime);
+      //console.log(formattedTime);
       return formattedTime;
     }
   },

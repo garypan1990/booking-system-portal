@@ -248,7 +248,7 @@ export default {
           });
       }
       if (this.scheduleDetails.type == 'add') {
-        console.log(body);
+        //console.log(body);
         body.schedules = [
           {
             bookingStartTime: startTimeISO,
@@ -281,10 +281,10 @@ export default {
       this.bookingDate = $event;
     },
     startTimeChanged($event) {
-      console.log('startTimeChanged');
+      //console.log('startTimeChanged');
 
       this.bookingStartTime = $event;
-      console.log(this.bookingStartTime);
+      //console.log(this.bookingStartTime);
     },
     endTimeCompute() {
       if (!this.scheduleDetails.start) return '';
