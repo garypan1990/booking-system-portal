@@ -31,7 +31,7 @@
                 label="Teacher Name"
                 :items="[
                   { text: 'Lovely', value: 103 },
-                  { text: 'Analie', value: 5215 },
+                  { text: 'Kat', value: 6219 },
                 ]"
               ></v-select>
               <!-- <v-text-field
