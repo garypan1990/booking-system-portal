@@ -129,7 +129,7 @@ export default {
     return {
       dialog: false,
       teachingTypeMap: { 0: 'Skype', 4: 'J Mode' },
-      teacherNameMap: { 103: 'Lovely', 5215: 'Analie' },
+      teacherNameMap: { 103: 'Lovely', 6219: 'Kat' },
       bookingDate: '',
       bookingStartTime: '',
       bookingEndTime: '',
