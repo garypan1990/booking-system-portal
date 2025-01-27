@@ -31,7 +31,8 @@
                 label="Teacher Name"
                 :items="[
                   { text: 'Lovely', value: 103 },
-                  { text: 'Kat', value: 6219 },
+                  { text: 'Analie', value: 5215 },
+                  { text: 'Kat', value: 6219 }
                 ]"
               ></v-select>
               <!-- <v-text-field
@@ -129,7 +130,7 @@ export default {
     return {
       dialog: false,
       teachingTypeMap: { 0: 'Skype', 4: 'J Mode' },
-      teacherNameMap: { 103: 'Lovely', 6219: 'Kat' },
+      teacherNameMap: { 103: 'Lovely', 5215:'Analie', 6219: 'Kat' },
       bookingDate: '',
       bookingStartTime: '',
       bookingEndTime: '',
